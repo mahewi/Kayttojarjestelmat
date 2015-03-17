@@ -5,18 +5,22 @@ import os
 if __name__ == '__main__':
         pass
 
-def fork():
+def parentProcess():
         for i in range(3):
                 newProcessId = os.fork()
                 if newProcessId == 0:
-                        os._exit(0)
+                        childProcess()
                 else:
-                        processIds = (newProcessId, os.getpid(), os.getpgid(newProcessId))
-                        #print "parentID: %d, ProcessID: %d, process groupID: %d" % processIds
+                        writeToFile()
 
-                        with open(str(newProcessId) + '.txt', 'w') as fout:
-                                fout.write('ProcessID: ' + str(processIds[0]) + '\n')
-                                fout.write('ParentID: ' + str(processIds[1]) + '\n')
-                                fout.write('Process groupID: ' + str(processIds[2]) + '\n')
+def childProcess():
+        writeToFile()
+        os._exit(0)
 
-fork()
+def writeToFile():
+        with open(str(os.getpid()) + '.txt', 'w') as fout:
+                fout.write('ProcessID: ' + str(os.getpid()) + '\n')
+                fout.write('ParentID: ' + str(os.getppid()) + '\n')
+                fout.write('Process groupID: ' + str(os.getpgid(os.getpid())) + '\n\n')
+
+parentProcess()
